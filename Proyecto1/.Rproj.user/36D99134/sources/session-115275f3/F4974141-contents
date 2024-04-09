@@ -1,0 +1,74 @@
+library(stringdist)
+library(ggplot2)
+library(scales)
+library("rstudioapi")    
+library(patchwork)
+library(tidyverse)
+
+data <- read.csv("Uso_Transporte_MAYO_2018-JUNIO_2020.csv", header = FALSE, sep = ";", stringsAsFactors = FALSE, skip =2, fileEncoding = "ISO-8859-1")
+
+# Split each row based on multiple semicolons (;;)
+data <- data %>%
+  mutate(row_data = strsplit(as.character(V1), ";;")) %>%
+  unnest(row_data) %>%
+  mutate(row_data = strsplit(row_data, ";")) %>%
+  unnest(row_data)
+
+# Separate the row_data into separate columns
+data <- data %>%
+  separate(row_data, into = paste0("Category", 1:9), sep = ";", fill="right")
+
+# Remove the first and last columns
+data <- data %>%
+  select(-1, -ncol(data)) %>%
+  select(where(~ any(!is.na(.))))
+
+# Remove the 10th column
+data <- data[, -10]
+
+# Get the names from the first row
+new_names <- unlist(data[1, ])
+# Rename the columns
+data <- setNames(data, new_names)
+
+# Filter rows based on conditions using if_any and if_all
+data <- data %>%
+  filter(if_any(everything(), ~ !(.x %in% names(data))),
+         if_all(everything(), ~ !(.x == "?")))
+
+# Remove "?" from all strings in the data frame
+data <- data %>% mutate(across(everything(), ~str_replace_all(., "\\?", "")))
+
+# Remove trailing spaces using if_any and if_all
+data <- data %>%
+  mutate(across(where(~any(str_detect(., "\\s"))), str_trim), 
+         across(where(~all(str_detect(., "\\s"))), str_trim))
+
+# Capitalize
+data <- data %>%
+  mutate(across(everything(), toupper))
+
+# Normalize strings by removing diacritics (accent marks)
+normalize_string <- function(string) {
+  return(stri_trans_general(string, "Latin-ASCII"))
+}
+
+
+##################### UNIDIMENSIONALES #########################################
+
+tiposervicio <- ggplot(data, aes(x = `TIPO SERVICIO`, fill = `TIPO SERVICIO`)) +
+  geom_bar()+
+  labs(title = "Cantidad de Tipos de Servicios", x="Servicio", y="Cantidad", fill = "Tipo de Servicio") +
+  theme(axis.text.x = element_text(angle=-45, vjust=0.2, hjust=0.2))+
+  theme(axis.title.x = element_text(face = "bold"))+
+  theme(axis.title.y = element_text(face = "bold"))
+
+
+tiposervicio
+##################### BIDIMENSIONALES #########################################
+
+##################### MULTIDIMENSIONALES #########################################
+
+##################### FACETA #########################################
+
+##################### COMPUESTA #########################################
