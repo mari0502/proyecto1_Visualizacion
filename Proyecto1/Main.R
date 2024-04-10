@@ -176,9 +176,66 @@ destino_plotly <- destino_plotly %>%
 # Print the plotly plot with the modified title and axis labels
 print(destino_plotly)
 
+#----------------------------------------------DIPUTADO/A GENERAL - TOP 5----------------------------------------------#
+
+diputados_counts <- data %>%
+  count(`DIPUTADO (A)`)
+
+# Rename columns for clarity
+colnames(diputados_counts) <- c("Diputados", "Viajes")
+
+# Sort the dataframe by the travel column in descending order
+diputados_counts <- diputados_counts %>%
+  arrange(desc(Viajes))
+
+# Take top 5 of deputies whith the most travels
+top_10_diputados <- diputados_counts[1:10, ]
+
+# Create the ggplot object
+diputado_plot <- ggplot(top_10_diputados, aes(x = Viajes, y = reorder(Diputados, Viajes) , fill = Diputados)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "<b>Uso de Transporte por Diputado - TOP 10</b>",  # Bold title
+    x = "CANTIDAD DE VIAJES",  # X-axis label
+    y = '', # Y-axis label
+    fill = "DIPUTADOS"   # fill-axis label
+  ) +
+  theme_minimal()
+
+# Convert ggplot to plotly
+diputado_plotly <- ggplotly(diputado_plot, tooltip = c("Viajes"))  # Customize label
+
+
+# Print the interactive plot
+print(diputado_plotly)
+
+
 ##################### BIDIMENSIONALES #########################################
+#----------------------------------------------Total KM vs Chofer----------------------------------------------#
+
+# Create the ggplot object 
+totalkm_chofer_plot <-ggplot(data, aes(x = `TOTAL KM`, y = `CHOFER`)) +
+  geom_point() +
+  labs(
+    title = "<b>Total KM vs. Chofer<b>",  # Bold title
+    x = "Total de Kilómetros",       # X-axis label
+    y = "Chofer"                     # Y-axis label
+  ) +
+  theme_minimal()
+
+# Convert ggplot to plotly
+totalkm_chofer_plotly <- ggplotly(totalkm_chofer_plot)
+
+# Print the interactive plot
+print(totalkm_chofer_plotly)
+
 
 #----------------------------------------------Combustible vs Destino----------------------------------------------#
+
+
+
+
+
 
 
 ##################### MULTIDIMENSIONALES #########################################
@@ -213,5 +270,8 @@ p <- plot_ly(data = summary_df, x = ~`DIPUTADO (A)`, y = ~TOTAL_KM_mean, color =
 print(p)
 
 ##################### FACETA #########################################
+
+
+
 
 ##################### COMPUESTA #########################################
