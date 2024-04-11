@@ -1,5 +1,6 @@
 library(stringdist)
 library(ggplot2)
+library(lubridate)
 library(scales)
 library(RColorBrewer)
 library("rstudioapi")    
@@ -176,8 +177,8 @@ destino_plotly <- destino_plotly %>%
 # Print the plotly plot with the modified title and axis labels
 print(destino_plotly)
 
-#----------------------------------------------DIPUTADO/A GENERAL - TOP 5----------------------------------------------#
-
+#----------------------------------------------DIPUTADO/A GENERAL - TOP 10----------------------------------------------#
+# Count the frequency of each deputies
 diputados_counts <- data %>%
   count(`DIPUTADO (A)`)
 
@@ -191,23 +192,13 @@ diputados_counts <- diputados_counts %>%
 # Take top 5 of deputies whith the most travels
 top_10_diputados <- diputados_counts[1:10, ]
 
-# Create the ggplot object
-diputado_plot <- ggplot(top_10_diputados, aes(x = Viajes, y = reorder(Diputados, Viajes) , fill = Diputados)) +
-  geom_bar(stat = "identity") +
-  labs(
-    title = "<b>Uso de Transporte por Diputado - TOP 10</b>",  # Bold title
-    x = "CANTIDAD DE VIAJES",  # X-axis label
-    y = '', # Y-axis label
-    fill = "DIPUTADOS"   # fill-axis label
-  ) +
-  theme_minimal()
+# Create the ggplotly object 
+diputados_plotly <- plot_ly(top_10_diputados, labels = ~Diputados, values = ~Viajes, type = "pie")
 
-# Convert ggplot to plotly
-diputado_plotly <- ggplotly(diputado_plot, tooltip = c("Viajes"))  # Customize label
+# Add title
+diputados_plotly <- diputados_plotly %>% layout(title = "<b>Uso de Transporte por Diputado - TOP 10<b>")
 
-
-# Print the interactive plot
-print(diputado_plotly)
+print(diputados_plotly)
 
 
 ##################### BIDIMENSIONALES #########################################
@@ -234,6 +225,8 @@ print(totalkm_chofer_plotly)
 
 
 ##################### MULTIDIMENSIONALES #########################################
+
+# -------------------------- DIPUTADO (A), DESTINO, CHOFER , COMBUSTIBLE, TIPO DE SERVICIO, TOTAL KM -----------------------------------#
 
 # Aggregate data
 summary_df <- data %>%
@@ -266,6 +259,8 @@ print(p)
 
 ##################### FACETA #########################################
 
+# -------------------------- CHOFER , TIPO DE SERVICIO, TOTAL KM -----------------------------------#
+# Aggregate data
 summary_faceta <- data %>%
   group_by(CHOFER, `TIPO SERVICIO`) %>%
   summarise(Total_KM = sum(`TOTAL KM`)/1000)
@@ -288,4 +283,62 @@ faceta_plotly <- ggplotly(faceta_plot)
 print(faceta_plotly)
 
 ##################### COMPUESTA #########################################
+
+# -------------------------- COMBUSTIBLE , TOTAL KM, AÑO(FECHA INICIAL) -----------------------------------#
+# Aggregate data
+summary_segunda_faceta <- data %>%
+  select(`FECHA INICIAL`, `TOTAL KM`, COMBUSTIBLE)
+
+# Take the year of each date
+summary_segunda_faceta$YEAR <- year(dmy(summary_segunda_faceta$`FECHA INICIAL`))
+
+# Create the ggplot object 
+segunda_faceta_plot <- ggplot(summary_segunda_faceta, aes(x = COMBUSTIBLE , y = `TOTAL KM`)) +
+  geom_point() +
+  facet_wrap(~ YEAR, scales = "free") +
+  labs(title = "Combustible vs. Total KM por año",
+       x = "COMBUSTIBLE",
+       y = "TOTAL KM")
+
+# -------------------------- TIPO DE SERVICIO VS DESTINO -----------------------------------#
+# Create the ggplot object 
+barras_aplicadas_plot <- ggplot(data, aes(fill = `TIPO SERVICIO`)) +
+  geom_bar(aes(x = `Destino_Group`), position = "stack", width = 0.7) +
+  labs(
+    title = "Distribución de Servicios por Destino",
+    x = "DESTINO",
+    y = "CANTIDAD",
+    fill = "SERVICIO"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_blank())
+
+# Convert ggplot to plotly
+segunda_faceta_plotly <- ggplotly(segunda_faceta_plot)
+barras_aplicadas_plotly <-  ggplotly(barras_aplicadas_plot)
+
+# Combinar los gráficos utilizando subplot
+imagen_compuesta_plot <- subplot(
+  barras_aplicadas_plotly, 
+  segunda_faceta_plotly, 
+  nrows = 2,
+  margin = 0.08
+)
+
+# Agregar etiquetas de los ejes y títulos a cada subgráfico
+imagen_compuesta_plot <- imagen_compuesta_plot %>%
+  layout(
+    title = "Uso de Transporte",  # Título del gráfico combinado
+    yaxis = list(title = "CANTIDAD"),  # Etiqueta del eje Y del primer gráfico
+    yaxis2 = list(title = "TOTAL KM"),  # Etiqueta del eje Y del segundo gráfico
+    xaxis = list(title = "DESTINO"),  # Etiqueta del eje X del primer gráfico
+    xaxis2 = list(title = "COMBUSTIBLE")  # Etiqueta del eje X del segundo gráfica
+  )
+
+# Mostrar el gráfico combinado
+print(imagen_compuesta_plot)
+
+
+
+
 
