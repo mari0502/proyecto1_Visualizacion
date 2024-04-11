@@ -1,0 +1,27 @@
+{
+    "id": "2B83C2C2",
+    "path": "~/GitHub/proyecto1_Visualizacion/Proyecto1/Main.R",
+    "project_path": "Main.R",
+    "type": "r_source",
+    "hash": "1876047306",
+    "contents": "",
+    "dirty": false,
+    "created": 1712756006139.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "291,0",
+        "scrollLine": "262",
+        "ignored_words": "Chofer\n"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1712769892,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1712769892325,
+    "read_only": false,
+    "read_only_alternatives": []
+}

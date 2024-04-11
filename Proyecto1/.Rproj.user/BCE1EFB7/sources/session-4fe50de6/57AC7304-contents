@@ -233,6 +233,11 @@ print(totalkm_chofer_plotly)
 #----------------------------------------------Combustible vs Destino----------------------------------------------#
 
 
+
+
+
+
+
 ##################### MULTIDIMENSIONALES #########################################
 
 # Aggregate data
@@ -266,26 +271,7 @@ print(p)
 
 ##################### FACETA #########################################
 
-summary_faceta <- data %>%
-  group_by(CHOFER, `TIPO SERVICIO`) %>%
-  summarise(Total_KM = sum(`TOTAL KM`)/1000)
 
-# Crear el gráfico de barras con facetas
-faceta_plot <- ggplot(summary_faceta, aes(x = `TIPO SERVICIO`, y = Total_KM, fill = `TIPO SERVICIO`)) + 
-  geom_col() +
-  facet_wrap(~ CHOFER) +
-  scale_y_continuous(labels = unit_format(unit = "KM")) +
-  labs(
-    title = "<b>Kilómetros recorridos por Chofer y Tipo de servicio<b>",
-    x = "CHOFERES",
-    y = "TOTAL KM"
-  )
 
-# Convert ggplot to plotly
-faceta_plotly <- ggplotly(faceta_plot)
-
-# Print the interactive plot
-print(faceta_plotly)
 
 ##################### COMPUESTA #########################################
-
