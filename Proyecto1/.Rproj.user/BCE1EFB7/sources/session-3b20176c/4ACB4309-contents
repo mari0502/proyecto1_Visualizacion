@@ -178,7 +178,7 @@ destino_plotly <- destino_plotly %>%
 print(destino_plotly)
 
 #----------------------------------------------DIPUTADO/A GENERAL - TOP 10----------------------------------------------#
-# Count the frequency of each deputies
+# Count each deputies
 diputados_counts <- data %>%
   count(`DIPUTADO (A)`)
 
@@ -192,13 +192,23 @@ diputados_counts <- diputados_counts %>%
 # Take top 5 of deputies whith the most travels
 top_10_diputados <- diputados_counts[1:10, ]
 
-# Create the ggplotly object 
-diputados_plotly <- plot_ly(top_10_diputados, labels = ~Diputados, values = ~Viajes, type = "pie")
+# Create the ggplot object
+diputado_plot <- ggplot(top_10_diputados, aes(x = Viajes, y = reorder(Diputados, Viajes) , fill = Diputados)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "<b>Uso de Transporte por Diputado - TOP 10</b>",  # Bold title
+    x = "CANTIDAD DE VIAJES",  # X-axis label
+    y = '', # Y-axis label
+    fill = "DIPUTADOS"   # fill-axis label
+  ) +
+  theme_minimal()
 
-# Add title
-diputados_plotly <- diputados_plotly %>% layout(title = "<b>Uso de Transporte por Diputado - TOP 10<b>")
+# Convert ggplot to plotly
+diputado_plotly <- ggplotly(diputado_plot, tooltip = c("Viajes"))  # Customize label
 
-print(diputados_plotly)
+
+# Print the interactive plot
+print(diputado_plotly)
 
 
 ##################### BIDIMENSIONALES #########################################
