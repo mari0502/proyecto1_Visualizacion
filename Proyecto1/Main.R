@@ -154,10 +154,10 @@ top_10_groups <- group_counts %>%
   top_n(10, wt = count) %>%
   mutate(Destino_Group = fct_reorder(Destino_Group, count))
 
-# Create the ggplot object without fct_reorder
+# Create the ggplot object
 destino <- ggplot(top_10_groups, aes(x = count, y = Destino_Group, fill = Destino_Group)) +
   geom_bar(stat = "identity") +
-  labs(x = "Visitas frecuentadas", y = "Destino", title = "<b>Top 10 destinos mas frecuentados</b>") +  # Bold title and axis labels
+  labs(x = "Visitas frecuentadas", y = "Destino", title = "<b>Top 10 destinos mas frecuentados</b>") +
   theme_minimal() +
   theme(axis.text.y = element_text(angle = 45, hjust = 1))
 
@@ -167,14 +167,12 @@ destino <- destino + scale_y_discrete(labels = function(x) ifelse(x == "Other", 
 # Convert ggplot to plotly
 destino_plotly <- ggplotly(destino)
 
-# Customize the layout to remove the legend and adjust Y-axis text angle
 destino_plotly <- destino_plotly %>%
   layout(
     legend = list(orientation = "h", y = -0.15),  # Position legend below the plot
-    yaxis = list(tickangle = 45)  # Rotate Y-axis text to 45 degrees
+    yaxis = list(tickangle = 45)
   )
 
-# Print the plotly plot with the modified title and axis labels
 print(destino_plotly)
 
 #----------------------------------------------DIPUTADO/A GENERAL - TOP 10----------------------------------------------#
@@ -189,7 +187,7 @@ colnames(diputados_counts) <- c("Diputados", "Viajes")
 diputados_counts <- diputados_counts %>%
   arrange(desc(Viajes))
 
-# Take top 5 of deputies whith the most travels
+# Take top 10 of deputies whith the most travels
 top_10_diputados <- diputados_counts[1:10, ]
 
 # Create the ggplot object
@@ -206,8 +204,6 @@ diputado_plot <- ggplot(top_10_diputados, aes(x = Viajes, y = reorder(Diputados,
 # Convert ggplot to plotly
 diputado_plotly <- ggplotly(diputado_plot, tooltip = c("Viajes"))  # Customize label
 
-
-# Print the interactive plot
 print(diputado_plotly)
 
 
@@ -233,6 +229,24 @@ print(totalkm_chofer_plotly)
 
 #----------------------------------------------Combustible vs Destino----------------------------------------------#
 
+# Filter the top 10 destinations
+top_destinations <- data %>%
+  group_by(DESTINO) %>%
+  summarise(total_combustible = sum(COMBUSTIBLE)) %>%
+  top_n(10, total_combustible)
+
+comb_dest <- ggplot(top_destinations, aes(x = DESTINO, y = total_combustible, fill = DESTINO)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Top 10 Destinos vs Combustible consumido",
+       x = "Destinos",
+       y = "Total Combustible (colones)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous(labels = scales::comma)
+
+comb_dest <- ggplotly(comb_dest)
+
+print(comb_dest)
 
 ##################### MULTIDIMENSIONALES #########################################
 
@@ -264,7 +278,6 @@ p <- plot_ly(data = summary_df, x = ~`DIPUTADO (A)`, y = ~TOTAL_KM_mean, color =
     colorway = brewer.pal(5, "Set2")  # Specify at least 3 colors for color palette
   )
 
-# Print the interactive plot
 print(p)
 
 ##################### FACETA #########################################
