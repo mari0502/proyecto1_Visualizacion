@@ -1,6 +1,5 @@
 ---
 title: "Proyecto 1"
-echo: FALSE
 ---
 
 El propósito de este proyecto es realizar un análisis exploratorio (EDA) de un conjunto de datos de interés. Para ello se deberá publicar una página Web en donde se describa el EDA realizado, incorporando una serie de visualizaciones que describen el comportamiento de los datos y los patrones identificados en los mismos.
